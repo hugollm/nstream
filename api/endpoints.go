@@ -1,7 +1,7 @@
 package api
 
-import "nts/signup"
+import "nts/status"
 
 var Endpoints []Endpoint = []Endpoint {
-    signup.Signup{},
+    status.Status{},
 }
