@@ -7,12 +7,12 @@ import (
 )
 
 func RunServer() {
-    http.HandleFunc("/", handleRequest)
+    http.HandleFunc("/", Handler)
     log.Println("Starting server on localhost:8080")
     log.Fatal(http.ListenAndServe("localhost:8080", nil))
 }
 
-func handleRequest(w http.ResponseWriter, r *http.Request) {
+func Handler(w http.ResponseWriter, r *http.Request) {
     request := common.Request{r}
     response := common.Response{w}
     for _, endpoint := range Endpoints {
