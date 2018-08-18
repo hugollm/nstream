@@ -1,8 +1,8 @@
 package api
 
-import "nts/common"
+import "net/http"
 
 type Endpoint interface {
-    Accept(request common.Request) bool
-    Handle(request common.Request, response common.Response)
+    Accept(request *http.Request) bool
+    Handle(request *http.Request, response http.ResponseWriter)
 }

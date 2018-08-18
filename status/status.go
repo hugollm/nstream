@@ -1,13 +1,13 @@
 package status
 
-import "nts/common"
+import "net/http"
 
 type Status struct {}
 
-func (s Status) Accept (request common.Request) bool {
-    return request.Method() == "GET" && request.Path() == "/"
+func (s Status) Accept (request *http.Request) bool {
+    return request.Method == "GET" && request.URL.Path == "/"
 }
 
-func (s Status) Handle (request common.Request, response common.Response) {
-    response.WriteString("OK")
+func (s Status) Handle (request *http.Request, response http.ResponseWriter) {
+    response.Write([]byte("OK"))
 }
