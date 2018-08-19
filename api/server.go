@@ -3,6 +3,7 @@ package api
 import (
     "log"
     "net/http"
+    "nts/common"
 )
 
 func RunServer() {
@@ -12,10 +13,16 @@ func RunServer() {
 }
 
 func Handler(response http.ResponseWriter, request *http.Request) {
+    found := false
     for _, endpoint := range Endpoints {
         if endpoint.Accept(request) {
             endpoint.Handle(request, response)
+            found = true
             break
         }
+    }
+    if !found {
+        err := common.NewNotFoundError()
+        err.WriteToResponse(response)
     }
 }

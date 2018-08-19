@@ -15,6 +15,10 @@ func NewApiError(code int, key string, message string) ApiError {
     return ApiError{code, key, message}
 }
 
+func NewNotFoundError() ApiError {
+    return NewApiError(404, "not-found", "Endpoint not found.")
+}
+
 func NewJsonError() ApiError {
     return NewApiError(400, "invalid-json", "Received input is not valid JSON.")
 }
