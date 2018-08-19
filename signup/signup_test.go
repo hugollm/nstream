@@ -37,39 +37,27 @@ func TestRejectPath(t *testing.T) {
 }
 
 func TestHandleWithProperData(t *testing.T) {
-    input := SignupInput{Email: "john.doe@gmail.com", Password: "12345678"}
-    request, response := makeRequest(input)
-    endpoint.Handle(request, response)
-    if response.Code != 200 {
-        t.Fail()
-    }
-    users.ClearUsers()
+    input := SignupInput{"john.doe@gmail.com", "12345678"}
+    assertSignup(t, input, 200, nil)
 }
 
 func TestNewUserIsRegistered(t *testing.T) {
-    email := "john.doe@gmail.com"
-    input := SignupInput{Email: email, Password: "12345678"}
+    input := SignupInput{"john.doe@gmail.com", "12345678"}
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
     user, err := users.GetUserByEmail("john.doe@gmail.com")
-    if err != nil || user.Email != email {
+    if err != nil || user.Email != input.Email {
         t.Fail()
     }
     users.ClearUsers()
 }
 
 func TestCannotRegisterTheSameEmailTwice(t *testing.T) {
-    email := "john.doe@gmail.com"
-    input := SignupInput{Email: email, Password: "12345678"}
+    input := SignupInput{"john.doe@gmail.com", "12345678"}
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
-    request, response = makeRequest(input)
-    endpoint.Handle(request, response)
-    expectedBody := errors.ValidationError("Email is already taken.").Error()
-    if response.Code != 400 || response.Body.String() != expectedBody {
-        t.Fail()
-    }
-    users.ClearUsers()
+    err := errors.ValidationError("Email is already taken.")
+    assertSignup(t, input, 400, err)
 }
 
 func TestInvalidJsonGetsRejected(t *testing.T) {
@@ -86,53 +74,40 @@ func TestInvalidJsonGetsRejected(t *testing.T) {
 
 func TestEmailIsRequired(t *testing.T) {
     input := SignupInput{"  \n", "12345678"}
-    request, response := makeRequest(input)
-    endpoint.Handle(request, response)
-    expectedBody := errors.ValidationError("Email is required.").Error()
-    if response.Code != 400 || response.Body.String() != expectedBody {
-        t.Fail()
-    }
-    users.ClearUsers()
+    err := errors.ValidationError("Email is required.")
+    assertSignup(t, input, 400, err)
 }
 
 func TestEmailMustBeValid(t *testing.T) {
     input := SignupInput{"invalid-email", "12345678"}
-    request, response := makeRequest(input)
-    endpoint.Handle(request, response)
-    expectedBody := errors.ValidationError("Invalid email.").Error()
-    if response.Code != 400 || response.Body.String() != expectedBody {
-        t.Fail()
-    }
-    users.ClearUsers()
+    err := errors.ValidationError("Invalid email.")
+    assertSignup(t, input, 400, err)
 }
 
 func TestPasswordIsRequired(t *testing.T) {
     input := SignupInput{"john.doe@gmail.com", ""}
-    request, response := makeRequest(input)
-    endpoint.Handle(request, response)
-    expectedBody := errors.ValidationError("Password is required.").Error()
-    if response.Code != 400 || response.Body.String() != expectedBody {
-        t.Fail()
-    }
-    users.ClearUsers()
+    err := errors.ValidationError("Password is required.")
+    assertSignup(t, input, 400, err)
 }
 
 func TestPasswordCanBeSpaces(t *testing.T) {
     input := SignupInput{"john.doe@gmail.com", "        "}
-    request, response := makeRequest(input)
-    endpoint.Handle(request, response)
-    if response.Code != 200 {
-        t.Fail()
-    }
-    users.ClearUsers()
+    assertSignup(t, input, 200, nil)
 }
 
 func TestPasswordCannotBeTooShort(t *testing.T) {
     input := SignupInput{"john.doe@gmail.com", "1234567"}
+    err := errors.ValidationError("Password must be at least 8 characters long.")
+    assertSignup(t, input, 400, err)
+}
+
+func assertSignup(t *testing.T, input SignupInput, code int, err error) {
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
-    expectedBody := errors.ValidationError("Password must be at least 8 characters long.").Error()
-    if response.Code != 400 || response.Body.String() != expectedBody {
+    if response.Code != code {
+        t.Fail()
+    }
+    if err != nil && response.Body.String() != err.Error() {
         t.Fail()
     }
     users.ClearUsers()
