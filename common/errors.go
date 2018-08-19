@@ -23,6 +23,10 @@ func NewJsonError() ApiError {
     return NewApiError(400, "invalid-json", "Received input is not valid JSON.")
 }
 
+func NewValidationError(message string) ApiError {
+    return NewApiError(400, "validation-error", message)
+}
+
 func (err ApiError) Error() string {
     return string(err.Json())
 }

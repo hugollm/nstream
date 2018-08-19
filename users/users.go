@@ -23,3 +23,7 @@ func GetUserByEmail(email string) (User, error) {
     }
     return User{}, errors.New("User not found.")
 }
+
+func ClearUsers() {
+    users = []User{}
+}
