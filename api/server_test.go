@@ -4,7 +4,7 @@ import (
     "io/ioutil"
     "net/http"
     "net/http/httptest"
-    "nts/common"
+    "nts/errors"
     "os"
     "testing"
 )
@@ -30,7 +30,7 @@ func TestNotFound(t *testing.T) {
     response, _ := http.Get(server.URL + "/not-found")
     body, _ := ioutil.ReadAll(response.Body)
     text := string(body)
-    expectedBody := common.NewNotFoundError().Error()
+    expectedBody := errors.NotFound().Error()
     if (response.StatusCode != 404 || text != expectedBody) {
         t.Fail()
     }

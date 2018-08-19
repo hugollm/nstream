@@ -3,7 +3,7 @@ package api
 import (
     "log"
     "net/http"
-    "nts/common"
+    "nts/errors"
 )
 
 func RunServer() {
@@ -22,7 +22,7 @@ func Handler(response http.ResponseWriter, request *http.Request) {
         }
     }
     if !found {
-        err := common.NewNotFoundError()
+        err := errors.NotFound()
         err.WriteToResponse(response)
     }
 }

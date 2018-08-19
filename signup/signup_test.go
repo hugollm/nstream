@@ -5,7 +5,7 @@ import (
     "encoding/json"
     "net/http"
     "net/http/httptest"
-    "nts/common"
+    "nts/errors"
     "nts/users"
     "testing"
 )
@@ -65,7 +65,7 @@ func TestCannotRegisterTheSameEmailTwice(t *testing.T) {
     endpoint.Handle(request, response)
     request, response = makeRequest(input)
     endpoint.Handle(request, response)
-    expectedBody := common.NewValidationError("Email is already taken.").Error()
+    expectedBody := errors.ValidationError("Email is already taken.").Error()
     if response.Code != 400 || response.Body.String() != expectedBody {
         t.Fail()
     }
@@ -77,7 +77,7 @@ func TestInvalidJsonGetsRejected(t *testing.T) {
     request := httptest.NewRequest("POST", "/signup", body)
     response := httptest.NewRecorder()
     endpoint.Handle(request, response)
-    expectedBody := common.NewJsonError().Error()
+    expectedBody := errors.InvalidJson().Error()
     if response.Code != 400 || response.Body.String() != expectedBody {
         t.Fail()
     }
@@ -88,7 +88,7 @@ func TestEmailIsRequired(t *testing.T) {
     input := SignupInput{"  \n", "12345678"}
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
-    expectedBody := common.NewValidationError("Email is required.").Error()
+    expectedBody := errors.ValidationError("Email is required.").Error()
     if response.Code != 400 || response.Body.String() != expectedBody {
         t.Fail()
     }
@@ -99,7 +99,7 @@ func TestEmailMustBeValid(t *testing.T) {
     input := SignupInput{"invalid-email", "12345678"}
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
-    expectedBody := common.NewValidationError("Invalid email.").Error()
+    expectedBody := errors.ValidationError("Invalid email.").Error()
     if response.Code != 400 || response.Body.String() != expectedBody {
         t.Fail()
     }
@@ -110,7 +110,7 @@ func TestPasswordIsRequired(t *testing.T) {
     input := SignupInput{"john.doe@gmail.com", ""}
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
-    expectedBody := common.NewValidationError("Password is required.").Error()
+    expectedBody := errors.ValidationError("Password is required.").Error()
     if response.Code != 400 || response.Body.String() != expectedBody {
         t.Fail()
     }
@@ -131,7 +131,7 @@ func TestPasswordCannotBeTooShort(t *testing.T) {
     input := SignupInput{"john.doe@gmail.com", "1234567"}
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
-    expectedBody := common.NewValidationError("Password must be at least 8 characters long.").Error()
+    expectedBody := errors.ValidationError("Password must be at least 8 characters long.").Error()
     if response.Code != 400 || response.Body.String() != expectedBody {
         t.Fail()
     }
