@@ -22,7 +22,7 @@ func (s Signup) Accept (request *http.Request) bool {
 
 func (s Signup) Handle (request *http.Request, response http.ResponseWriter) {
     input, err := validateRequest(request)
-    if err.Code != 0 {
+    if err.NotEmpty() {
         err.WriteToResponse(response)
         return
     }
@@ -54,5 +54,5 @@ func validateRequest(request *http.Request) (SignupInput, errors.ApiError) {
     if getErr == nil {
         return input, errors.ValidationError("Email is already taken.")
     }
-    return input, errors.ApiError{}
+    return input, errors.Empty()
 }

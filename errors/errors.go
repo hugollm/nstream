@@ -15,6 +15,10 @@ func NewApiError(code int, key string, message string) ApiError {
     return ApiError{code, key, message}
 }
 
+func Empty() ApiError {
+    return ApiError{}
+}
+
 func NotFound() ApiError {
     return NewApiError(404, "not-found", "Endpoint not found.")
 }
@@ -39,6 +43,10 @@ func (apiErr ApiError) Json() []byte {
         panic(err)
     }
     return json
+}
+
+func (err ApiError) NotEmpty() bool {
+    return err.Code != 0
 }
 
 func (err ApiError) WriteToResponse(response http.ResponseWriter) {
