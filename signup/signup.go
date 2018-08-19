@@ -3,6 +3,7 @@ package signup
 import (
     "encoding/json"
     "net/http"
+    "nts/common"
     "nts/users"
 )
 
@@ -20,7 +21,7 @@ func (s Signup) Accept (request *http.Request) bool {
 func (s Signup) Handle (request *http.Request, response http.ResponseWriter) {
     input, err := readInput(request)
     if err != nil {
-        response.WriteHeader(400)
+        common.NewJsonError().WriteToResponse(response)
         return
     }
     users.AddUser(input.Email, input.Password)

@@ -5,6 +5,7 @@ import (
     "encoding/json"
     "net/http"
     "net/http/httptest"
+    "nts/common"
     "nts/users"
     "testing"
 )
@@ -48,6 +49,17 @@ func TestNewUserIsRegistered(t *testing.T) {
     endpoint.Handle(request, response)
     user, err := users.GetUserByEmail("john.doe@gmail.com")
     if err != nil || user.Email != email {
+        t.Fail()
+    }
+}
+
+func TestInvalidJsonGetsRejected(t *testing.T) {
+    body := bytes.NewBuffer([]byte("invalid-json"))
+    request := httptest.NewRequest("POST", "/signup", body)
+    response := httptest.NewRecorder()
+    endpoint.Handle(request, response)
+    expectedBody := common.NewJsonError().Error()
+    if response.Code != 400 || response.Body.String() != expectedBody {
         t.Fail()
     }
 }
