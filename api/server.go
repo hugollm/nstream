@@ -1,9 +1,10 @@
 package api
 
 import (
+    "errors"
     "log"
     "net/http"
-    "nts/errors"
+    "nts/common"
 )
 
 func RunServer() {
@@ -22,7 +23,8 @@ func Handler(response http.ResponseWriter, request *http.Request) {
         }
     }
     if !found {
-        err := errors.NotFound()
-        err.WriteToResponse(response)
+        err := errors.New("Specified endpoint is unknown.")
+        out := common.NewErrorOutput(404, map[string]error{"not-found": err})
+        out.WriteToResponse(response)
     }
 }

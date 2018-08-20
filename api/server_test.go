@@ -1,10 +1,11 @@
 package api
 
 import (
+    "errors"
     "io/ioutil"
     "net/http"
     "net/http/httptest"
-    "nts/errors"
+    "nts/common"
     "os"
     "testing"
 )
@@ -30,8 +31,9 @@ func TestNotFound(t *testing.T) {
     response, _ := http.Get(server.URL + "/not-found")
     body, _ := ioutil.ReadAll(response.Body)
     text := string(body)
-    expectedBody := errors.NotFound().Error()
-    if (response.StatusCode != 404 || text != expectedBody) {
+    err := errors.New("Specified endpoint is unknown.")
+    out := common.NewErrorOutput(404, map[string]error{"not-found": err})
+    if (response.StatusCode != 404 || text != out.String()) {
         t.Fail()
     }
 }

@@ -3,9 +3,10 @@ package signup
 import (
     "bytes"
     "encoding/json"
+    "errors"
     "net/http"
     "net/http/httptest"
-    "nts/errors"
+    "nts/common"
     "nts/users"
     "testing"
 )
@@ -56,8 +57,8 @@ func TestCannotRegisterTheSameEmailTwice(t *testing.T) {
     input := SignupInput{"john.doe@gmail.com", "12345678"}
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
-    err := errors.ValidationError("Email is already taken.")
-    assertSignup(t, input, 400, err)
+    errors := map[string]error{"email": errors.New("Email is already taken.")}
+    assertSignup(t, input, 400, errors)
 }
 
 func TestInvalidJsonGetsRejected(t *testing.T) {
@@ -65,8 +66,9 @@ func TestInvalidJsonGetsRejected(t *testing.T) {
     request := httptest.NewRequest("POST", "/signup", body)
     response := httptest.NewRecorder()
     endpoint.Handle(request, response)
-    expectedBody := errors.InvalidJson().Error()
-    if response.Code != 400 || response.Body.String() != expectedBody {
+    errors := map[string]error{"json": errors.New("Invalid JSON.")}
+    out := common.NewErrorOutput(400, errors)
+    if response.Code != 400 || response.Body.String() != out.String() {
         t.Fail()
     }
     users.ClearUsers()
@@ -74,20 +76,20 @@ func TestInvalidJsonGetsRejected(t *testing.T) {
 
 func TestEmailIsRequired(t *testing.T) {
     input := SignupInput{"  \n", "12345678"}
-    err := errors.ValidationError("Email is required.")
-    assertSignup(t, input, 400, err)
+    errors := map[string]error{"email": errors.New("Email is required.")}
+    assertSignup(t, input, 400, errors)
 }
 
 func TestEmailMustBeValid(t *testing.T) {
     input := SignupInput{"invalid-email", "12345678"}
-    err := errors.ValidationError("Invalid email.")
-    assertSignup(t, input, 400, err)
+    errors := map[string]error{"email": errors.New("Invalid email.")}
+    assertSignup(t, input, 400, errors)
 }
 
 func TestPasswordIsRequired(t *testing.T) {
     input := SignupInput{"john.doe@gmail.com", ""}
-    err := errors.ValidationError("Password is required.")
-    assertSignup(t, input, 400, err)
+    errors := map[string]error{"password": errors.New("Password is required.")}
+    assertSignup(t, input, 400, errors)
 }
 
 func TestPasswordCanBeSpaces(t *testing.T) {
@@ -97,17 +99,18 @@ func TestPasswordCanBeSpaces(t *testing.T) {
 
 func TestPasswordCannotBeTooShort(t *testing.T) {
     input := SignupInput{"john.doe@gmail.com", "1234567"}
-    err := errors.ValidationError("Password must be at least 8 characters long.")
-    assertSignup(t, input, 400, err)
+    errors := map[string]error{"password": errors.New("Password must be at least 8 characters long.")}
+    assertSignup(t, input, 400, errors)
 }
 
-func assertSignup(t *testing.T, input SignupInput, code int, err error) {
+func assertSignup(t *testing.T, input SignupInput, code int, errors map[string]error) {
     request, response := makeRequest(input)
     endpoint.Handle(request, response)
     if response.Code != code {
         t.Fail()
     }
-    if err != nil && response.Body.String() != err.Error() {
+    out := common.NewErrorOutput(400, errors)
+    if len(errors) > 0 && response.Body.String() != out.String() {
         t.Fail()
     }
     users.ClearUsers()

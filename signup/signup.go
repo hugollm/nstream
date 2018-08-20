@@ -5,7 +5,7 @@ import (
     "encoding/json"
     "net/http"
     "net/mail"
-    ntserrors "nts/errors"
+    "nts/common"
     "nts/users"
     "strings"
 )
@@ -17,33 +17,40 @@ type SignupInput struct {
     Password string
 }
 
+type SignupOutput struct {
+    Ok bool
+}
+
 func (s Signup) Accept (request *http.Request) bool {
     return request.Method == "POST" && request.URL.Path == "/signup"
 }
 
 func (s Signup) Handle (request *http.Request, response http.ResponseWriter) {
-    input, err := validateRequest(request)
-    if err.NotEmpty() {
-        err.WriteToResponse(response)
+    input, errors := validateRequest(request)
+    if len(errors) > 0 {
+        out := common.NewErrorOutput(400, errors)
+        out.WriteToResponse(response)
         return
     }
     users.AddUser(input.Email, input.Password)
 }
 
-func validateRequest(request *http.Request) (SignupInput, ntserrors.ApiError) {
+func validateRequest(request *http.Request) (SignupInput, map[string]error) {
+    errors := make(map[string]error)
     input, jsonErr := validateJson(request)
     if jsonErr != nil {
-        return input, ntserrors.InvalidJson()
+        errors["json"] = jsonErr
+        return SignupInput{}, errors
     }
     vEmail, emailErr := validateEmail(input.Email)
     if emailErr != nil {
-        return input, ntserrors.ValidationError(emailErr.Error())
+        errors["email"] = emailErr
     }
     vPassword, passwordErr := validatePassword(input.Password)
     if passwordErr != nil {
-        return input, ntserrors.ValidationError(passwordErr.Error())
+        errors["password"] = passwordErr
     }
-    return SignupInput{vEmail, vPassword}, ntserrors.Empty()
+    return SignupInput{vEmail, vPassword}, errors
 }
 
 func validateJson(request *http.Request) (SignupInput, error) {
