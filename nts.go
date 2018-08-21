@@ -1,6 +1,6 @@
 package main
 
-import "nts/api"
+import "nstream/api"
 
 func main() {
     api.RunServer()

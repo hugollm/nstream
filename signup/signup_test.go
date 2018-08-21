@@ -6,8 +6,8 @@ import (
     "errors"
     "net/http"
     "net/http/httptest"
-    "nts/common"
-    "nts/users"
+    "nstream/common"
+    "nstream/users"
     "testing"
 )
 

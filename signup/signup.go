@@ -5,8 +5,8 @@ import (
     "encoding/json"
     "net/http"
     "net/mail"
-    "nts/common"
-    "nts/users"
+    "nstream/common"
+    "nstream/users"
     "strings"
 )
 

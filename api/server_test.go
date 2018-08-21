@@ -5,7 +5,7 @@ import (
     "io/ioutil"
     "net/http"
     "net/http/httptest"
-    "nts/common"
+    "nstream/common"
     "os"
     "testing"
 )

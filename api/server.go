@@ -4,7 +4,7 @@ import (
     "errors"
     "log"
     "net/http"
-    "nts/common"
+    "nstream/common"
 )
 
 func RunServer() {

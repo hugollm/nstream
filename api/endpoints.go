@@ -1,8 +1,8 @@
 package api
 
 import (
-    "nts/signup"
-    "nts/status"
+    "nstream/signup"
+    "nstream/status"
 )
 
 var Endpoints []Endpoint = []Endpoint {
