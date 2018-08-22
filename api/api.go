@@ -14,17 +14,24 @@ func NewApi(endpoints []Endpoint) NtsApi {
 }
 
 func (api NtsApi) Handle(request *http.Request, response http.ResponseWriter) {
-    found := false
+    found := api.FindEndpoint(request, response)
+    if !found {
+        api.NotFound(response)
+    }
+}
+
+func (api NtsApi) FindEndpoint(request *http.Request, response http.ResponseWriter) bool {
     for _, ep := range api.endpoints {
         if ep.Accept(request) {
-            found = true
             ep.Handle(request, response)
-            break
+            return true
         }
     }
-    if !found {
-        err := errors.New("Endpoint not found.")
-        out := NewErrorOutput(404, map[string]error{"not_found": err})
-        out.WriteToResponse(response)
-    }
+    return false
+}
+
+func (api NtsApi) NotFound(response http.ResponseWriter) {
+    err := errors.New("Endpoint not found.")
+    out := NewErrorOutput(404, map[string]error{"not_found": err})
+    out.WriteToResponse(response)
 }
