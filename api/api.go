@@ -24,7 +24,7 @@ func (api NtsApi) Handle(request *http.Request, response http.ResponseWriter) {
     }
     if !found {
         err := errors.New("Endpoint not found.")
-        out := NewErrorOutput(404, map[string]error{"not-found": err})
+        out := NewErrorOutput(404, map[string]error{"not_found": err})
         out.WriteToResponse(response)
     }
 }

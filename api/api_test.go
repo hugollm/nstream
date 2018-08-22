@@ -19,7 +19,7 @@ func TestApiReturns404IfNoEndpointHandlesTheRequest(t *testing.T) {
     api := NewApi([]Endpoint{})
     response := makeRequest(api, "/foo")
     err := errors.New("Endpoint not found.")
-    out := NewErrorOutput(404, map[string]error{"not-found": err})
+    out := NewErrorOutput(404, map[string]error{"not_found": err})
     if response.Code != 404 || response.Body.String() != out.String() {
         t.Fail()
     }
