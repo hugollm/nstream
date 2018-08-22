@@ -15,6 +15,14 @@ func TestApiCanHandleRequests(t *testing.T) {
     }
 }
 
+func TestApiWritesJsonContentTypeHeader(t *testing.T) {
+    api := NewApi([]Endpoint{})
+    response := makeRequest(api, "/")
+    if response.Header().Get("Content-Type") != "application/json" {
+        t.Fail()
+    }
+}
+
 func TestApiReturns404IfNoEndpointHandlesTheRequest(t *testing.T) {
     api := NewApi([]Endpoint{})
     response := makeRequest(api, "/foo")

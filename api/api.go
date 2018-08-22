@@ -14,6 +14,7 @@ func NewApi(endpoints []Endpoint) NtsApi {
 }
 
 func (api NtsApi) Handle(request *http.Request, response http.ResponseWriter) {
+    response.Header().Add("Content-Type", "application/json")
     found := api.FindEndpoint(request, response)
     if !found {
         api.NotFound(response)
