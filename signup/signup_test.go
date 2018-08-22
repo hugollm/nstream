@@ -6,7 +6,7 @@ import (
     "errors"
     "net/http"
     "net/http/httptest"
-    "nstream/common"
+    "nstream/api"
     "nstream/users"
     "testing"
 )
@@ -67,7 +67,7 @@ func TestInvalidJsonGetsRejected(t *testing.T) {
     response := httptest.NewRecorder()
     endpoint.Handle(request, response)
     errors := map[string]error{"json": errors.New("Invalid JSON.")}
-    out := common.NewErrorOutput(400, errors)
+    out := api.NewErrorOutput(400, errors)
     if response.Code != 400 || response.Body.String() != out.String() {
         t.Fail()
     }
@@ -109,7 +109,7 @@ func assertSignup(t *testing.T, input SignupInput, code int, errors map[string]e
     if response.Code != code {
         t.Fail()
     }
-    out := common.NewErrorOutput(400, errors)
+    out := api.NewErrorOutput(400, errors)
     if len(errors) > 0 && response.Body.String() != out.String() {
         t.Fail()
     }

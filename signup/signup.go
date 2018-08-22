@@ -5,7 +5,7 @@ import (
     "encoding/json"
     "net/http"
     "net/mail"
-    "nstream/common"
+    "nstream/api"
     "nstream/users"
     "strings"
 )
@@ -28,7 +28,7 @@ func (s Signup) Accept (request *http.Request) bool {
 func (s Signup) Handle (request *http.Request, response http.ResponseWriter) {
     input, errors := validateRequest(request)
     if len(errors) > 0 {
-        out := common.NewErrorOutput(400, errors)
+        out := api.NewErrorOutput(400, errors)
         out.WriteToResponse(response)
         return
     }
