@@ -13,36 +13,54 @@ import (
 
 var endpoint Signup = Signup{}
 
-func TestAccept(t *testing.T) {
+func TestSignup(t *testing.T) {
+	tests := map[string]func(t *testing.T){
+		"testAccept":                          testAccept,
+		"testRejectMethod":                    testRejectMethod,
+		"testRejectPath":                      testRejectPath,
+		"testHandleWithProperData":            testHandleWithProperData,
+		"testNewUserIsRegistered":             testNewUserIsRegistered,
+		"testCannotRegisterTheSameEmailTwice": testCannotRegisterTheSameEmailTwice,
+		"testInvalidJsonGetsRejected":         testInvalidJsonGetsRejected,
+		"testEmailIsRequired":                 testEmailIsRequired,
+		"testEmailMustBeValid":                testEmailMustBeValid,
+		"testPasswordIsRequired":              testPasswordIsRequired,
+		"testPasswordCanBeSpaces":             testPasswordCanBeSpaces,
+		"testPasswordCannotBeTooShort":        testPasswordCannotBeTooShort,
+	}
+	for name, test := range tests {
+		users.ClearUsers()
+		t.Run(name, test)
+	}
+}
+
+func testAccept(t *testing.T) {
 	request := httptest.NewRequest("POST", "/signup", nil)
 	if !endpoint.Accept(request) {
 		t.Fail()
 	}
-	users.ClearUsers()
 }
 
-func TestRejectMethod(t *testing.T) {
+func testRejectMethod(t *testing.T) {
 	request := httptest.NewRequest("GET", "/signup", nil)
 	if endpoint.Accept(request) {
 		t.Fail()
 	}
-	users.ClearUsers()
 }
 
-func TestRejectPath(t *testing.T) {
+func testRejectPath(t *testing.T) {
 	request := httptest.NewRequest("POST", "/signup/", nil)
 	if endpoint.Accept(request) {
 		t.Fail()
 	}
-	users.ClearUsers()
 }
 
-func TestHandleWithProperData(t *testing.T) {
+func testHandleWithProperData(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "12345678"}
 	assertSignup(t, input, 200, nil)
 }
 
-func TestNewUserIsRegistered(t *testing.T) {
+func testNewUserIsRegistered(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "12345678"}
 	request, response := makeRequest(input)
 	endpoint.Handle(request, response)
@@ -50,10 +68,9 @@ func TestNewUserIsRegistered(t *testing.T) {
 	if err != nil || user.Email != input.Email {
 		t.Fail()
 	}
-	users.ClearUsers()
 }
 
-func TestCannotRegisterTheSameEmailTwice(t *testing.T) {
+func testCannotRegisterTheSameEmailTwice(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "12345678"}
 	request, response := makeRequest(input)
 	endpoint.Handle(request, response)
@@ -61,7 +78,7 @@ func TestCannotRegisterTheSameEmailTwice(t *testing.T) {
 	assertSignup(t, input, 400, errors)
 }
 
-func TestInvalidJsonGetsRejected(t *testing.T) {
+func testInvalidJsonGetsRejected(t *testing.T) {
 	body := bytes.NewBuffer([]byte("invalid-json"))
 	request := httptest.NewRequest("POST", "/signup", body)
 	response := httptest.NewRecorder()
@@ -71,33 +88,32 @@ func TestInvalidJsonGetsRejected(t *testing.T) {
 	if response.Code != 400 || response.Body.String() != out.String() {
 		t.Fail()
 	}
-	users.ClearUsers()
 }
 
-func TestEmailIsRequired(t *testing.T) {
+func testEmailIsRequired(t *testing.T) {
 	input := SignupInput{"  \n", "12345678"}
 	errors := map[string]error{"email": errors.New("Email is required.")}
 	assertSignup(t, input, 400, errors)
 }
 
-func TestEmailMustBeValid(t *testing.T) {
+func testEmailMustBeValid(t *testing.T) {
 	input := SignupInput{"invalid-email", "12345678"}
 	errors := map[string]error{"email": errors.New("Invalid email.")}
 	assertSignup(t, input, 400, errors)
 }
 
-func TestPasswordIsRequired(t *testing.T) {
+func testPasswordIsRequired(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", ""}
 	errors := map[string]error{"password": errors.New("Password is required.")}
 	assertSignup(t, input, 400, errors)
 }
 
-func TestPasswordCanBeSpaces(t *testing.T) {
+func testPasswordCanBeSpaces(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "        "}
 	assertSignup(t, input, 200, nil)
 }
 
-func TestPasswordCannotBeTooShort(t *testing.T) {
+func testPasswordCannotBeTooShort(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "1234567"}
 	errors := map[string]error{"password": errors.New("Password must be at least 8 characters long.")}
 	assertSignup(t, input, 400, errors)
@@ -113,7 +129,6 @@ func assertSignup(t *testing.T, input SignupInput, code int, errors map[string]e
 	if len(errors) > 0 && response.Body.String() != out.String() {
 		t.Fail()
 	}
-	users.ClearUsers()
 }
 
 func makeRequest(input SignupInput) (*http.Request, *httptest.ResponseRecorder) {
