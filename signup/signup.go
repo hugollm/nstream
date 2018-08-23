@@ -3,6 +3,7 @@ package signup
 import (
 	"encoding/json"
 	"errors"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/mail"
 	"nstream/api"
@@ -86,5 +87,17 @@ func validatePassword(password string) (string, error) {
 	if len(password) < 8 {
 		return password, errors.New("Password must be at least 8 characters long.")
 	}
-	return password, nil
+	hashed, err := hashPassword(password)
+	if err != nil {
+		return password, errors.New("Failed to hash password.")
+	}
+	return hashed, nil
+}
+
+func hashPassword(password string) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return password, err
+	}
+	return string(hashed), nil
 }

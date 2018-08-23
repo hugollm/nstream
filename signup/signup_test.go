@@ -27,6 +27,7 @@ func TestSignup(t *testing.T) {
 		"testPasswordIsRequired":              testPasswordIsRequired,
 		"testPasswordCanBeSpaces":             testPasswordCanBeSpaces,
 		"testPasswordCannotBeTooShort":        testPasswordCannotBeTooShort,
+		"testPasswordsAreHashed":              testPasswordsAreHashed,
 	}
 	for name, test := range tests {
 		users.ClearUsers()
@@ -117,6 +118,15 @@ func testPasswordCannotBeTooShort(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "1234567"}
 	errors := map[string]error{"password": errors.New("Password must be at least 8 characters long.")}
 	assertSignup(t, input, 400, errors)
+}
+
+func testPasswordsAreHashed(t *testing.T) {
+	input := SignupInput{"john.doe@gmail.com", "12345678"}
+	assertSignup(t, input, 200, nil)
+	user, _ := users.GetUserByEmail("john.doe@gmail.com")
+	if user.Password == "12345678" {
+		t.Fail()
+	}
 }
 
 func assertSignup(t *testing.T, input SignupInput, code int, errors map[string]error) {
