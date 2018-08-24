@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"nstream/api"
-	"nstream/users"
 	"testing"
 )
 
@@ -31,9 +30,13 @@ func TestSignup(t *testing.T) {
 		"testPasswordsAreHashed":              testPasswordsAreHashed,
 	}
 	for name, test := range tests {
-		users.ClearUsers()
+		clearUsers()
 		t.Run(name, test)
 	}
+}
+
+func clearUsers() {
+	api.DB.Exec("DELETE FROM users")
 }
 
 func testAccept(t *testing.T) {
@@ -66,8 +69,7 @@ func testNewUserIsRegistered(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "12345678"}
 	request, response := makeRequest(input)
 	endpoint.Handle(request, response)
-	user, err := users.GetUserByEmail("john.doe@gmail.com")
-	if err != nil || user.Email != input.Email {
+	if !userWithEmailExists("john.doe@gmail.com") {
 		t.Fail()
 	}
 }
@@ -124,11 +126,17 @@ func testPasswordCannotBeTooShort(t *testing.T) {
 func testPasswordsAreHashed(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "12345678"}
 	assertSignup(t, input, 200, nil)
-	user, _ := users.GetUserByEmail("john.doe@gmail.com")
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte("12345678"))
+	password := getPasswordFromUserWithEmail("john.doe@gmail.com")
+	err := bcrypt.CompareHashAndPassword([]byte(password), []byte("12345678"))
 	if err != nil {
 		t.Fail()
 	}
+}
+
+func getPasswordFromUserWithEmail(email string) string {
+	var password string
+	api.DB.QueryRow("SELECT password FROM users WHERE email = $1 LIMIT 1", email).Scan(&password)
+	return password
 }
 
 func assertSignup(t *testing.T, input SignupInput, code int, errors map[string]error) {
