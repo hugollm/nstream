@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/http/httptest"
 	"nstream/api"
@@ -124,7 +125,8 @@ func testPasswordsAreHashed(t *testing.T) {
 	input := SignupInput{"john.doe@gmail.com", "12345678"}
 	assertSignup(t, input, 200, nil)
 	user, _ := users.GetUserByEmail("john.doe@gmail.com")
-	if user.Password == "12345678" {
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte("12345678"))
+	if err != nil {
 		t.Fail()
 	}
 }
