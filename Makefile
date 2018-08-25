@@ -1,11 +1,14 @@
+pkg = ./...
+
 run:
 	go run server.go
 
 format:
-	go fmt ./...
+	go fmt $(pkg)
+
 
 watch-tests:
-	watch -n 1 go test -cover ./...
+	watch -n 1 go test -v -cover $(pkg)
 
 coverage:
 	go test -coverprofile=/tmp/golang-coverage-report ./...
