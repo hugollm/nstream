@@ -3,11 +3,8 @@ package signup
 import (
 	"encoding/json"
 	"errors"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
-	"net/mail"
 	"nstream/api"
-	"strings"
 )
 
 type Signup struct{}
@@ -60,42 +57,4 @@ func validateJson(request *http.Request) (SignupInput, error) {
 		return input, errors.New("Invalid JSON.")
 	}
 	return input, nil
-}
-
-func validateEmail(email string) (string, error) {
-	email = strings.TrimSpace(email)
-	if email == "" {
-		return email, errors.New("Email is required.")
-	}
-	parsed, parseErr := mail.ParseAddress(email)
-	if parseErr != nil {
-		return email, errors.New("Invalid email.")
-	}
-	email = parsed.Address
-	if userWithEmailExists(email) {
-		return email, errors.New("Email is already taken.")
-	}
-	return email, nil
-}
-
-func validatePassword(password string) (string, error) {
-	if password == "" {
-		return password, errors.New("Password is required.")
-	}
-	if len(password) < 8 {
-		return password, errors.New("Password must be at least 8 characters long.")
-	}
-	hashed, err := hashPassword(password)
-	if err != nil {
-		return password, errors.New("Failed to hash password.")
-	}
-	return hashed, nil
-}
-
-func hashPassword(password string) (string, error) {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return password, err
-	}
-	return string(hashed), nil
 }

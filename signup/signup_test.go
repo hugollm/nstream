@@ -30,8 +30,8 @@ func TestSignup(t *testing.T) {
 		"testPasswordsAreHashed":              testPasswordsAreHashed,
 	}
 	for name, test := range tests {
-		clearDbUsers()
 		t.Run(name, test)
+		clearDbUsers()
 	}
 }
 
