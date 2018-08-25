@@ -30,13 +30,9 @@ func TestSignup(t *testing.T) {
 		"testPasswordsAreHashed":              testPasswordsAreHashed,
 	}
 	for name, test := range tests {
-		clearUsers()
+		clearDbUsers()
 		t.Run(name, test)
 	}
-}
-
-func clearUsers() {
-	api.DB.Exec("DELETE FROM users")
 }
 
 func testAccept(t *testing.T) {

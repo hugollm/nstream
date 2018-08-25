@@ -8,7 +8,6 @@ import (
 	"net/mail"
 	"nstream/api"
 	"strings"
-	"database/sql"
 )
 
 type Signup struct{}
@@ -33,14 +32,7 @@ func (s Signup) Handle(request *http.Request, response http.ResponseWriter) {
 		out.WriteToResponse(response)
 		return
 	}
-	addUser(input)
-}
-
-func addUser(input SignupInput) {
-	_, err := api.DB.Exec("INSERT INTO USERS (email, password) VALUES ($1, $2)", input.Email, input.Password)
-	if err != nil {
-		panic(err)
-	}
+	addUser(input.Email, input.Password)
 }
 
 func validateRequest(request *http.Request) (SignupInput, map[string]error) {
@@ -84,19 +76,6 @@ func validateEmail(email string) (string, error) {
 		return email, errors.New("Email is already taken.")
 	}
 	return email, nil
-}
-
-func userWithEmailExists(email string) bool {
-	var id int
-	err := api.DB.QueryRow("SELECT id FROM users WHERE email = $1 LIMIT 1", email).Scan(&id)
-	switch {
-		case err == sql.ErrNoRows:
-			return false
-		case err != nil:
-			panic(err)
-		default:
-			return id > 0
-	}
 }
 
 func validatePassword(password string) (string, error) {
