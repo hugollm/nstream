@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"nstream/api"
+	"nstream/login"
 	"nstream/signup"
 	"nstream/status"
 )
@@ -22,4 +23,5 @@ func handler(response http.ResponseWriter, request *http.Request) {
 var nts api.NtsApi = api.NewApi([]api.Endpoint{
 	status.Status{},
 	signup.Signup{},
+	login.Login{},
 })
