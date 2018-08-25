@@ -1,8 +1,8 @@
 package signup
 
 import (
-	"testing"
 	"golang.org/x/crypto/bcrypt"
+	"testing"
 )
 
 func TestValidEmail(t *testing.T) {

@@ -69,7 +69,7 @@ func TestSignupInputIsValidated(t *testing.T) {
 	defer clearDbUsers()
 	input := SignupInput{"", ""}
 	errors := map[string]error{
-		"email": errors.New("Email is required."),
+		"email":    errors.New("Email is required."),
 		"password": errors.New("Password is required."),
 	}
 	assertSignup(t, input, 400, errors)

@@ -1,10 +1,10 @@
 package signup
 
 import (
-	"net/mail"
-	"strings"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
+	"net/mail"
+	"strings"
 )
 
 func validateEmail(email string) (string, error) {
