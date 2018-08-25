@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/http/httptest"
 	"nstream/api"
@@ -13,55 +12,38 @@ import (
 
 var endpoint Signup = Signup{}
 
-func TestSignup(t *testing.T) {
-	tests := map[string]func(t *testing.T){
-		"testAccept":                          testAccept,
-		"testRejectMethod":                    testRejectMethod,
-		"testRejectPath":                      testRejectPath,
-		"testHandleWithProperData":            testHandleWithProperData,
-		"testNewUserIsRegistered":             testNewUserIsRegistered,
-		"testCannotRegisterTheSameEmailTwice": testCannotRegisterTheSameEmailTwice,
-		"testInvalidJsonGetsRejected":         testInvalidJsonGetsRejected,
-		"testEmailIsRequired":                 testEmailIsRequired,
-		"testEmailMustBeValid":                testEmailMustBeValid,
-		"testPasswordIsRequired":              testPasswordIsRequired,
-		"testPasswordCanBeSpaces":             testPasswordCanBeSpaces,
-		"testPasswordCannotBeTooShort":        testPasswordCannotBeTooShort,
-		"testPasswordsAreHashed":              testPasswordsAreHashed,
-	}
-	for name, test := range tests {
-		t.Run(name, test)
-		clearDbUsers()
-	}
-}
-
-func testAccept(t *testing.T) {
+func TestAccept(t *testing.T) {
+	defer clearDbUsers()
 	request := httptest.NewRequest("POST", "/signup", nil)
 	if !endpoint.Accept(request) {
 		t.Fail()
 	}
 }
 
-func testRejectMethod(t *testing.T) {
+func TestRejectMethod(t *testing.T) {
+	defer clearDbUsers()
 	request := httptest.NewRequest("GET", "/signup", nil)
 	if endpoint.Accept(request) {
 		t.Fail()
 	}
 }
 
-func testRejectPath(t *testing.T) {
+func TestRejectPath(t *testing.T) {
+	defer clearDbUsers()
 	request := httptest.NewRequest("POST", "/signup/", nil)
 	if endpoint.Accept(request) {
 		t.Fail()
 	}
 }
 
-func testHandleWithProperData(t *testing.T) {
+func TestHandleWithProperData(t *testing.T) {
+	defer clearDbUsers()
 	input := SignupInput{"john.doe@gmail.com", "12345678"}
 	assertSignup(t, input, 200, nil)
 }
 
-func testNewUserIsRegistered(t *testing.T) {
+func TestNewUserIsRegistered(t *testing.T) {
+	defer clearDbUsers()
 	input := SignupInput{"john.doe@gmail.com", "12345678"}
 	request, response := makeRequest(input)
 	endpoint.Handle(request, response)
@@ -70,15 +52,8 @@ func testNewUserIsRegistered(t *testing.T) {
 	}
 }
 
-func testCannotRegisterTheSameEmailTwice(t *testing.T) {
-	input := SignupInput{"john.doe@gmail.com", "12345678"}
-	request, response := makeRequest(input)
-	endpoint.Handle(request, response)
-	errors := map[string]error{"email": errors.New("Email is already taken.")}
-	assertSignup(t, input, 400, errors)
-}
-
-func testInvalidJsonGetsRejected(t *testing.T) {
+func TestInvalidJsonGetsRejected(t *testing.T) {
+	defer clearDbUsers()
 	body := bytes.NewBuffer([]byte("invalid-json"))
 	request := httptest.NewRequest("POST", "/signup", body)
 	response := httptest.NewRecorder()
@@ -90,49 +65,14 @@ func testInvalidJsonGetsRejected(t *testing.T) {
 	}
 }
 
-func testEmailIsRequired(t *testing.T) {
-	input := SignupInput{"  \n", "12345678"}
-	errors := map[string]error{"email": errors.New("Email is required.")}
-	assertSignup(t, input, 400, errors)
-}
-
-func testEmailMustBeValid(t *testing.T) {
-	input := SignupInput{"invalid-email", "12345678"}
-	errors := map[string]error{"email": errors.New("Invalid email.")}
-	assertSignup(t, input, 400, errors)
-}
-
-func testPasswordIsRequired(t *testing.T) {
-	input := SignupInput{"john.doe@gmail.com", ""}
-	errors := map[string]error{"password": errors.New("Password is required.")}
-	assertSignup(t, input, 400, errors)
-}
-
-func testPasswordCanBeSpaces(t *testing.T) {
-	input := SignupInput{"john.doe@gmail.com", "        "}
-	assertSignup(t, input, 200, nil)
-}
-
-func testPasswordCannotBeTooShort(t *testing.T) {
-	input := SignupInput{"john.doe@gmail.com", "1234567"}
-	errors := map[string]error{"password": errors.New("Password must be at least 8 characters long.")}
-	assertSignup(t, input, 400, errors)
-}
-
-func testPasswordsAreHashed(t *testing.T) {
-	input := SignupInput{"john.doe@gmail.com", "12345678"}
-	assertSignup(t, input, 200, nil)
-	password := getPasswordFromUserWithEmail("john.doe@gmail.com")
-	err := bcrypt.CompareHashAndPassword([]byte(password), []byte("12345678"))
-	if err != nil {
-		t.Fail()
+func TestSignupInputIsValidated(t *testing.T) {
+	defer clearDbUsers()
+	input := SignupInput{"", ""}
+	errors := map[string]error{
+		"email": errors.New("Email is required."),
+		"password": errors.New("Password is required."),
 	}
-}
-
-func getPasswordFromUserWithEmail(email string) string {
-	var password string
-	api.DB.QueryRow("SELECT password FROM users WHERE email = $1 LIMIT 1", email).Scan(&password)
-	return password
+	assertSignup(t, input, 400, errors)
 }
 
 func assertSignup(t *testing.T, input SignupInput, code int, errors map[string]error) {
