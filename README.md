@@ -11,8 +11,8 @@ In development.
 
 The API must provide the following features:
 
-* [ ] Signup
-* [ ] Login
+* [x] Signup
+* [x] Login
 * [ ] Logout
 * [ ] Write note
 * [ ] Edit note
@@ -20,3 +20,4 @@ The API must provide the following features:
 * [ ] Fetch notes by date interval
 * [ ] Email confirmation
 * [ ] Password recovery
+* [ ] CORS
