@@ -2,16 +2,22 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
 type ErrorOutput struct {
-	code   int
-	errors map[string]error
+	code int
+	errs map[string]error
 }
 
-func NewErrorOutput(code int, errors map[string]error) ErrorOutput {
-	return ErrorOutput{code, errors}
+func NewErrorOutput(code int, errs map[string]error) ErrorOutput {
+	return ErrorOutput{code, errs}
+}
+
+func NewJsonErrorOutput() ErrorOutput {
+	errs := map[string]error{"json": errors.New("Invalid JSON.")}
+	return ErrorOutput{400, errs}
 }
 
 func (out ErrorOutput) WriteToResponse(response http.ResponseWriter) {
@@ -22,7 +28,7 @@ func (out ErrorOutput) WriteToResponse(response http.ResponseWriter) {
 func (out ErrorOutput) Json() []byte {
 	data := make(map[string]map[string]string)
 	data["errors"] = make(map[string]string)
-	for key, value := range out.errors {
+	for key, value := range out.errs {
 		data["errors"][key] = value.Error()
 	}
 	json, err := json.Marshal(data)
