@@ -2,11 +2,11 @@ package login
 
 import (
 	"nstream/data/mock"
+	"strings"
 	"testing"
 )
 
 func TestGetUserByEmail(t *testing.T) {
-	defer mock.Clear()
 	mocked := mock.User()
 	user, err := getUser(mocked.Email)
 	if err != nil || user.Id == 0 || user.Email != mocked.Email || user.Password != mocked.Password {
@@ -22,17 +22,16 @@ func TestGetUserWithUnregisteredEmail(t *testing.T) {
 }
 
 func TestGetUserIsCaseInsensitive(t *testing.T) {
-	defer mock.Clear()
 	mocked := mock.User()
-	mock.Update("users", mocked.Id, "email", "JOHN.DOE@gmail.com")
-	user, err := getUser("john.doe@GMAIL.COM")
-	if err != nil || user.Email != "JOHN.DOE@gmail.com" {
+	mocked.Email = strings.ToUpper(mocked.Email)
+	mock.Update("users", mocked.Id, "email", mocked.Email)
+	user, err := getUser(strings.ToLower(mocked.Email))
+	if err != nil || user.Email != mocked.Email {
 		t.Fail()
 	}
 }
 
 func TestAddSessionReturnsStrongToken(t *testing.T) {
-	defer mock.Clear()
 	user := mock.User()
 	token := addSession(user.Id)
 	if len(token) < 64 {
@@ -41,7 +40,6 @@ func TestAddSessionReturnsStrongToken(t *testing.T) {
 }
 
 func TestAddedSessionGetsPersisted(t *testing.T) {
-	defer mock.Clear()
 	user := mock.User()
 	token := addSession(user.Id)
 	if !mock.Exists("sessions", "token", token) {

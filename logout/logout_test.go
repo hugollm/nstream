@@ -1,10 +1,10 @@
 package logout
 
 import (
-	"testing"
 	"net/http/httptest"
-	"nstream/data/mock"
 	"nstream/api"
+	"nstream/data/mock"
+	"testing"
 )
 
 var endpoint Logout = Logout{}
@@ -17,7 +17,6 @@ func TestAccept(t *testing.T) {
 }
 
 func TestSuccessfulLogout(t *testing.T) {
-	defer mock.Clear()
 	session := mock.Session()
 	request := httptest.NewRequest("POST", "/logout", nil)
 	response := httptest.NewRecorder()
@@ -28,7 +27,7 @@ func TestSuccessfulLogout(t *testing.T) {
 	}
 }
 
-func TestAuthError(t *testing.T ) {
+func TestAuthError(t *testing.T) {
 	request := httptest.NewRequest("POST", "/logout", nil)
 	response := httptest.NewRecorder()
 	request.Header.Add("Auth-Token", "invalid-token")

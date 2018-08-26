@@ -5,13 +5,6 @@ import (
 	"nstream/data"
 )
 
-func Clear() {
-	_, err := data.DB.Exec("DELETE FROM users")
-	if err != nil {
-		panic(err)
-	}
-}
-
 func Update(table string, id int, col string, value interface{}) {
 	query := fmt.Sprintf("UPDATE %s SET %s = $1 WHERE id = $2", table, col)
 	_, err := data.DB.Exec(query, value, id)

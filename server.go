@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"nstream/api"
 	"nstream/login"
+	"nstream/logout"
 	"nstream/signup"
 	"nstream/status"
-	"nstream/logout"
 )
 
 func main() {

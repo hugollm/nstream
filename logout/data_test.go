@@ -6,7 +6,6 @@ import (
 )
 
 func TestDeleteSession(t *testing.T) {
-	defer mock.Clear()
 	session := mock.Session()
 	deleteSession(session.Token)
 	if mock.Exists("sessions", "id", session.Id) {

@@ -15,11 +15,9 @@ func hashPassword(password string) string {
 }
 
 func TestValidLoginInput(t *testing.T) {
-	defer mock.Clear()
 	user := mock.User()
-	mock.Update("users", user.Id, "email", "john.doe@gmail.com")
 	mock.Update("users", user.Id, "password", hashPassword("12345678"))
-	input := LoginInput{"john.doe@gmail.com", "12345678"}
+	input := LoginInput{user.Email, "12345678"}
 	user, errs := validateInput(input)
 	if len(errs) > 0 || user.Id == 0 {
 		t.Fail()
@@ -35,10 +33,9 @@ func TestEmailNotFound(t *testing.T) {
 }
 
 func TestPasswordMismatch(t *testing.T) {
-	defer mock.Clear()
 	user := mock.User()
-	mock.Update("users", user.Id, "email", "john.doe@gmail.com")
-	input := LoginInput{"john.doe@gmail.com", "wrong-password"}
+	mock.Update("users", user.Id, "email", user.Email)
+	input := LoginInput{user.Email, "wrong-password"}
 	_, errs := validateInput(input)
 	if len(errs) == 0 || errs["password"].Error() != "Wrong password." {
 		t.Fail()

@@ -7,7 +7,6 @@ import (
 )
 
 func TestAuthenticateAcceptsRequest(t *testing.T) {
-	defer mock.Clear()
 	session := mock.Session()
 	request := httptest.NewRequest("POST", "/mocked", nil)
 	request.Header.Add("Auth-Token", session.Token)
@@ -26,7 +25,6 @@ func TestAuthenticateWithNoAuthHeader(t *testing.T) {
 }
 
 func TestValidTokenAuthReturnsUser(t *testing.T) {
-	defer mock.Clear()
 	session := mock.Session()
 	user, err := tokenAuth(session.Token)
 	if err != nil || user.Id != session.UserId || user.Email == "" {

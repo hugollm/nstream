@@ -56,14 +56,12 @@ func TestRejectPath(t *testing.T) {
 }
 
 func TestLoginWithValidCredentials(t *testing.T) {
-	defer mock.Clear()
 	user := mock.User()
-	mock.Update("users", user.Id, "email", "john.doe@gmail.com")
 	mock.Update("users", user.Id, "password", hashPassword("12345678"))
-	input := LoginInput{"john.doe@gmail.com", "12345678"}
+	input := LoginInput{user.Email, "12345678"}
 	request, response := makeRequest(input)
 	endpoint.Handle(request, response)
-	token := getDbSessionTokenByUserEmail("john.doe@gmail.com")
+	token := getDbSessionTokenByUserEmail(user.Email)
 	out := LoginOutput{token}
 	if response.Code != 200 {
 		t.Fail()
@@ -92,10 +90,9 @@ func TestLoginWithInvalidEmail(t *testing.T) {
 }
 
 func TestLoginWithInvalidPassword(t *testing.T) {
-	defer mock.Clear()
 	user := mock.User()
-	mock.Update("users", user.Id, "email", "john.doe@gmail.com")
-	input := LoginInput{"john.doe@gmail.com", "invalid-password"}
+	mock.Update("users", user.Id, "email", user.Email)
+	input := LoginInput{user.Email, "invalid-password"}
 	errs := map[string]error{"password": errors.New("Wrong password.")}
 	assertLogin(t, input, 400, errs)
 }

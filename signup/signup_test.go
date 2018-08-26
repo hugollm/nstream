@@ -14,7 +14,6 @@ import (
 var endpoint Signup = Signup{}
 
 func TestAccept(t *testing.T) {
-	defer mock.Clear()
 	request := httptest.NewRequest("POST", "/signup", nil)
 	if !endpoint.Accept(request) {
 		t.Fail()
@@ -22,7 +21,6 @@ func TestAccept(t *testing.T) {
 }
 
 func TestRejectMethod(t *testing.T) {
-	defer mock.Clear()
 	request := httptest.NewRequest("GET", "/signup", nil)
 	if endpoint.Accept(request) {
 		t.Fail()
@@ -30,7 +28,6 @@ func TestRejectMethod(t *testing.T) {
 }
 
 func TestRejectPath(t *testing.T) {
-	defer mock.Clear()
 	request := httptest.NewRequest("POST", "/signup/", nil)
 	if endpoint.Accept(request) {
 		t.Fail()
@@ -38,23 +35,22 @@ func TestRejectPath(t *testing.T) {
 }
 
 func TestHandleWithProperData(t *testing.T) {
-	defer mock.Clear()
-	input := SignupInput{"john.doe@gmail.com", "12345678"}
+	email := mock.RandString(50) + "@gmail.com"
+	input := SignupInput{email, "12345678"}
 	assertSignup(t, input, 200, nil)
 }
 
 func TestNewUserIsRegistered(t *testing.T) {
-	defer mock.Clear()
-	input := SignupInput{"john.doe@gmail.com", "12345678"}
+	email := mock.RandString(50) + "@gmail.com"
+	input := SignupInput{email, "12345678"}
 	request, response := makeRequest(input)
 	endpoint.Handle(request, response)
-	if !userWithEmailExists("john.doe@gmail.com") {
+	if !userWithEmailExists(email) {
 		t.Fail()
 	}
 }
 
 func TestInvalidJsonGetsRejected(t *testing.T) {
-	defer mock.Clear()
 	body := bytes.NewBuffer([]byte("invalid-json"))
 	request := httptest.NewRequest("POST", "/signup", body)
 	response := httptest.NewRecorder()
@@ -67,7 +63,6 @@ func TestInvalidJsonGetsRejected(t *testing.T) {
 }
 
 func TestSignupInputIsValidated(t *testing.T) {
-	defer mock.Clear()
 	input := SignupInput{"", ""}
 	errors := map[string]error{
 		"email":    errors.New("Email is required."),
