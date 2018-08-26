@@ -13,7 +13,7 @@ The API must provide the following features:
 
 * [x] Signup
 * [x] Login
-* [ ] Logout
+* [x] Logout
 * [ ] Write note
 * [ ] Edit note
 * [ ] Delete note
