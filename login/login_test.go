@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"nstream/api"
+	"nstream/data"
 	"nstream/data/mock"
 	"testing"
 )
@@ -76,7 +77,7 @@ func getDbSessionTokenByUserEmail(email string) (token string) {
 	query := `SELECT token FROM sessions
 	INNER JOIN users ON users.id = sessions.user_id
 	WHERE users.email = $1 LIMIT 1`
-	row := api.DB.QueryRow(query, email)
+	row := data.DB.QueryRow(query, email)
 	err := row.Scan(&token)
 	if err != nil {
 		panic(err)
