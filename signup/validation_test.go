@@ -2,6 +2,7 @@ package signup
 
 import (
 	"golang.org/x/crypto/bcrypt"
+	"nstream/data/mock"
 	"testing"
 )
 
@@ -48,8 +49,9 @@ func TestEmailCasingIsPreserved(t *testing.T) {
 }
 
 func TestEmailMustNotBeTaken(t *testing.T) {
-	defer clearDbUsers()
-	makeDbUser("john.doe@gmail.com", "some-hash")
+	defer mock.Clear()
+	user := mock.User()
+	mock.Update("users", user.Id, "email", "john.doe@gmail.com")
 	_, err := validateEmail("John.DOE@gmail.com")
 	if err == nil || err.Error() != "Email is already taken." {
 		t.Fail()
