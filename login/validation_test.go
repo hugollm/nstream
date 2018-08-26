@@ -2,6 +2,7 @@ package login
 
 import (
 	"golang.org/x/crypto/bcrypt"
+	"nstream/data/mock"
 	"testing"
 )
 
@@ -14,11 +15,13 @@ func hashPassword(password string) string {
 }
 
 func TestValidLoginInput(t *testing.T) {
-	defer clearDbUsers()
-	makeDbUser("john.doe@gmail.com", hashPassword("12345678"))
+	defer mock.Clear()
+	user := mock.User()
+	mock.Update("users", user.Id, "email", "john.doe@gmail.com")
+	mock.Update("users", user.Id, "password", hashPassword("12345678"))
 	input := LoginInput{"john.doe@gmail.com", "12345678"}
 	user, errs := validateInput(input)
-	if len(errs) > 0 || user.id == 0 {
+	if len(errs) > 0 || user.Id == 0 {
 		t.Fail()
 	}
 }
@@ -32,8 +35,9 @@ func TestEmailNotFound(t *testing.T) {
 }
 
 func TestPasswordMismatch(t *testing.T) {
-	defer clearDbUsers()
-	makeDbUser("john.doe@gmail.com", hashPassword("12345678"))
+	defer mock.Clear()
+	user := mock.User()
+	mock.Update("users", user.Id, "email", "john.doe@gmail.com")
 	input := LoginInput{"john.doe@gmail.com", "wrong-password"}
 	_, errs := validateInput(input)
 	if len(errs) == 0 || errs["password"].Error() != "Wrong password." {

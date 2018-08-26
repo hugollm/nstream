@@ -25,7 +25,7 @@ func (login Login) Handle(request *http.Request, response http.ResponseWriter) {
 		out.WriteToResponse(response)
 		return
 	}
-	token := addSession(user.id)
+	token := addSession(user.Id)
 	out := LoginOutput{token}
 	response.Write(out.Json())
 }

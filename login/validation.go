@@ -3,6 +3,7 @@ package login
 import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
+	"nstream/data"
 )
 
 type LoginInput struct {
@@ -10,14 +11,14 @@ type LoginInput struct {
 	Password string
 }
 
-func validateInput(input LoginInput) (User, map[string]error) {
+func validateInput(input LoginInput) (data.User, map[string]error) {
 	var errs = make(map[string]error)
 	user, uErr := getUser(input.Email)
 	if uErr != nil {
 		errs["email"] = errors.New("Email not found.")
 		return user, errs
 	}
-	pErr := bcrypt.CompareHashAndPassword([]byte(user.password), []byte(input.Password))
+	pErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
 	if pErr != nil {
 		errs["password"] = errors.New("Wrong password.")
 		return user, errs
