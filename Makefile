@@ -8,6 +8,7 @@ format:
 	go fmt $(pkg)
 
 test:
+	@go clean -testcache
 	@go test -v $(pkg) | $(nicer_test_output)
 
 watch-tests:
