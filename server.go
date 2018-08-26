@@ -7,6 +7,7 @@ import (
 	"nstream/login"
 	"nstream/signup"
 	"nstream/status"
+	"nstream/logout"
 )
 
 func main() {
@@ -24,4 +25,5 @@ var nts api.NtsApi = api.NewApi([]api.Endpoint{
 	status.Status{},
 	signup.Signup{},
 	login.Login{},
+	logout.Logout{},
 })

@@ -20,6 +20,11 @@ func NewJsonErrorOutput() ErrorOutput {
 	return ErrorOutput{400, errs}
 }
 
+func NewAuthErrorOutput() ErrorOutput {
+	errs := map[string]error{"auth": errors.New("Authentication failed.")}
+	return ErrorOutput{401, errs}
+}
+
 func (out ErrorOutput) WriteToResponse(response http.ResponseWriter) {
 	response.WriteHeader(out.code)
 	response.Write(out.Json())
