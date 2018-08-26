@@ -20,7 +20,7 @@ coverage:
 database:
 	sudo -u postgres psql -c "DROP DATABASE IF EXISTS nstream"
 	sudo -u postgres psql -c "CREATE DATABASE nstream"
-	sudo -u postgres psql nstream -f schema.sql
+	sudo -u postgres psql nstream -f data/schema.sql
 
 
 nicer_test_output = sed "/RUN/d" | sed "/PASS/s//$(green)/" | sed "/FAIL/s//$(red)/"
