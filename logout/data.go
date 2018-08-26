@@ -1,12 +1,12 @@
 package logout
 
 import (
-	"nstream/api"
+	"nstream/data"
 )
 
 func deleteSession(token string) {
 	query := "DELETE FROM sessions WHERE token = $1"
-	_, err := api.DB.Exec(query, token)
+	_, err := data.DB.Exec(query, token)
 	if err != nil {
 		panic(err)
 	}
