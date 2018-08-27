@@ -7,11 +7,6 @@ import (
 	"strings"
 )
 
-type SignupInput struct {
-	Email    string
-	Password string
-}
-
 func validateInput(input SignupInput) (SignupInput, map[string]error) {
 	errors := make(map[string]error)
 	vEmail, emailErr := validateEmail(input.Email)

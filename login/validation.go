@@ -6,11 +6,6 @@ import (
 	"nstream/data"
 )
 
-type LoginInput struct {
-	Email    string
-	Password string
-}
-
 func validateInput(input LoginInput) (data.User, map[string]error) {
 	var errs = make(map[string]error)
 	user, uErr := getUser(input.Email)

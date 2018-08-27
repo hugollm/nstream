@@ -7,6 +7,15 @@ import (
 
 type Login struct{}
 
+type LoginInput struct {
+	Email    string
+	Password string
+}
+
+type LoginOutput struct {
+	Token string `json:"token"`
+}
+
 func (login Login) Accept(request *http.Request) bool {
 	return request.Method == "POST" && request.URL.Path == "/login"
 }
@@ -25,8 +34,4 @@ func (login Login) Handle(request *http.Request, response http.ResponseWriter) {
 	}
 	token := addSession(user.Id)
 	api.WriteOutput(response, 200, LoginOutput{token})
-}
-
-type LoginOutput struct {
-	Token string `json:"token"`
 }

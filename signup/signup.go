@@ -7,6 +7,11 @@ import (
 
 type Signup struct{}
 
+type SignupInput struct {
+	Email    string
+	Password string
+}
+
 func (s Signup) Accept(request *http.Request) bool {
 	return request.Method == "POST" && request.URL.Path == "/signup"
 }
