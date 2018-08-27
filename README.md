@@ -14,10 +14,11 @@ The API must provide the following features:
 * [x] Signup
 * [x] Login
 * [x] Logout
-* [ ] Write note
+* [x] Write note
 * [ ] Edit note
 * [ ] Delete note
 * [ ] Fetch notes by date interval
 * [ ] Email confirmation
 * [ ] Password recovery
 * [ ] CORS
+* [ ] Search notes by text
