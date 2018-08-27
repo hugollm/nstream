@@ -5,15 +5,20 @@ import (
 	"net/http"
 )
 
-type NtsApi struct {
+type Api struct {
 	endpoints []Endpoint
 }
 
-func NewApi(endpoints []Endpoint) NtsApi {
-	return NtsApi{endpoints}
+type Endpoint interface {
+	Accept(request *http.Request) bool
+	Handle(request *http.Request, response http.ResponseWriter)
 }
 
-func (api NtsApi) Handle(request *http.Request, response http.ResponseWriter) {
+func NewApi(endpoints []Endpoint) Api {
+	return Api{endpoints}
+}
+
+func (api Api) Handle(request *http.Request, response http.ResponseWriter) {
 	response.Header().Add("Content-Type", "application/json")
 	found := api.FindEndpoint(request, response)
 	if !found {
@@ -21,7 +26,7 @@ func (api NtsApi) Handle(request *http.Request, response http.ResponseWriter) {
 	}
 }
 
-func (api NtsApi) FindEndpoint(request *http.Request, response http.ResponseWriter) bool {
+func (api Api) FindEndpoint(request *http.Request, response http.ResponseWriter) bool {
 	for _, ep := range api.endpoints {
 		if ep.Accept(request) {
 			ep.Handle(request, response)
@@ -31,7 +36,7 @@ func (api NtsApi) FindEndpoint(request *http.Request, response http.ResponseWrit
 	return false
 }
 
-func (api NtsApi) NotFound(response http.ResponseWriter) {
+func (api Api) NotFound(response http.ResponseWriter) {
 	err := errors.New("Endpoint not found.")
 	WriteErrors(response, 404, map[string]error{"not_found": err})
 }

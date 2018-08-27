@@ -21,7 +21,7 @@ func handler(response http.ResponseWriter, request *http.Request) {
 	nts.Handle(request, response)
 }
 
-var nts api.NtsApi = api.NewApi([]api.Endpoint{
+var nts api.Api = api.NewApi([]api.Endpoint{
 	status.Status{},
 	signup.Signup{},
 	login.Login{},
