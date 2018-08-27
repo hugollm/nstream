@@ -11,3 +11,10 @@ create table if not exists sessions (
     token varchar(64) not null,
     created_at timestamp with time zone default current_timestamp
 );
+
+create table if not exists notes (
+    id bigserial primary key,
+    user_id bigint not null references users (id) on delete cascade,
+    content text,
+    created_at timestamp with time zone default current_timestamp
+);

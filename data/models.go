@@ -15,3 +15,10 @@ type Session struct {
 	Token     string
 	CreatedAt time.Time
 }
+
+type Note struct {
+	Id        int
+	UserId    int
+	Content   string
+	CreatedAt time.Time
+}
