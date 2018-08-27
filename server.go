@@ -6,6 +6,7 @@ import (
 	"nstream/api"
 	"nstream/login"
 	"nstream/logout"
+	notesnew "nstream/notes/new"
 	"nstream/signup"
 	"nstream/status"
 )
@@ -26,4 +27,5 @@ var nts api.Api = api.NewApi([]api.Endpoint{
 	signup.Signup{},
 	login.Login{},
 	logout.Logout{},
+	notesnew.NewNote{},
 })
