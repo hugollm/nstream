@@ -15,8 +15,7 @@ func (l Logout) Accept(request *http.Request) bool {
 func (l Logout) Handle(request *http.Request, response http.ResponseWriter) {
 	_, err := auth.Authenticate(request)
 	if err != nil {
-		out := api.NewAuthErrorOutput()
-		out.WriteToResponse(response)
+		api.WriteAuthError(response)
 		return
 	}
 	deleteSession(request.Header.Get("Auth-Token"))

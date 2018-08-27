@@ -1,7 +1,6 @@
 package login
 
 import (
-	"encoding/json"
 	"net/http"
 	"nstream/api"
 )
@@ -13,37 +12,21 @@ func (login Login) Accept(request *http.Request) bool {
 }
 
 func (login Login) Handle(request *http.Request, response http.ResponseWriter) {
-	input, jsonErr := readInput(request)
+	var input LoginInput
+	jsonErr := api.ReadInput(request, &input)
 	if jsonErr != nil {
-		out := api.NewJsonErrorOutput()
-		out.WriteToResponse(response)
+		api.WriteJsonError(response)
 		return
 	}
 	user, errs := validateInput(input)
 	if len(errs) > 0 {
-		out := api.NewErrorOutput(400, errs)
-		out.WriteToResponse(response)
+		api.WriteErrors(response, 400, errs)
 		return
 	}
 	token := addSession(user.Id)
-	out := LoginOutput{token}
-	response.Write(out.Json())
-}
-
-func readInput(request *http.Request) (LoginInput, error) {
-	var input LoginInput
-	err := json.NewDecoder(request.Body).Decode(&input)
-	return input, err
+	api.WriteOutput(response, 200, LoginOutput{token})
 }
 
 type LoginOutput struct {
 	Token string `json:"token"`
-}
-
-func (out LoginOutput) Json() []byte {
-	jsonOut, err := json.Marshal(out)
-	if err != nil {
-		panic(err)
-	}
-	return jsonOut
 }

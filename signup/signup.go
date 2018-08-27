@@ -1,7 +1,6 @@
 package signup
 
 import (
-	"encoding/json"
 	"net/http"
 	"nstream/api"
 )
@@ -13,23 +12,16 @@ func (s Signup) Accept(request *http.Request) bool {
 }
 
 func (s Signup) Handle(request *http.Request, response http.ResponseWriter) {
-	input, err := readInput(request)
+	var input SignupInput
+	err := api.ReadInput(request, &input)
 	if err != nil {
-		out := api.NewJsonErrorOutput()
-		out.WriteToResponse(response)
+		api.WriteJsonError(response)
 		return
 	}
 	input, errs := validateInput(input)
 	if len(errs) > 0 {
-		out := api.NewErrorOutput(400, errs)
-		out.WriteToResponse(response)
+		api.WriteErrors(response, 400, errs)
 		return
 	}
 	addUser(input.Email, input.Password)
-}
-
-func readInput(request *http.Request) (SignupInput, error) {
-	var input SignupInput
-	err := json.NewDecoder(request.Body).Decode(&input)
-	return input, err
 }

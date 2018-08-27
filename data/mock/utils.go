@@ -1,6 +1,7 @@
 package mock
 
 import (
+	"encoding/json"
 	"fmt"
 	"nstream/data"
 )
@@ -22,4 +23,12 @@ func Exists(table string, col string, value interface{}) bool {
 		panic(err)
 	}
 	return exists
+}
+
+func Json(input interface{}) string {
+	bytes, err := json.Marshal(input)
+	if err != nil {
+		panic(err)
+	}
+	return string(bytes)
 }

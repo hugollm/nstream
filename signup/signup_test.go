@@ -1,13 +1,12 @@
 package signup
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"nstream/api"
 	"nstream/data/mock"
+	"strings"
 	"testing"
 )
 
@@ -51,13 +50,11 @@ func TestNewUserIsRegistered(t *testing.T) {
 }
 
 func TestInvalidJsonGetsRejected(t *testing.T) {
-	body := bytes.NewBuffer([]byte("invalid-json"))
+	body := strings.NewReader("invalid-json")
 	request := httptest.NewRequest("POST", "/signup", body)
 	response := httptest.NewRecorder()
 	endpoint.Handle(request, response)
-	errors := map[string]error{"json": errors.New("Invalid JSON.")}
-	out := api.NewErrorOutput(400, errors)
-	if response.Code != 400 || response.Body.String() != out.String() {
+	if response.Code != 400 {
 		t.Fail()
 	}
 }
@@ -71,21 +68,23 @@ func TestSignupInputIsValidated(t *testing.T) {
 	assertSignup(t, input, 400, errors)
 }
 
-func assertSignup(t *testing.T, input SignupInput, code int, errors map[string]error) {
+func assertSignup(t *testing.T, input SignupInput, code int, errs map[string]error) {
 	request, response := makeRequest(input)
 	endpoint.Handle(request, response)
 	if response.Code != code {
 		t.Fail()
 	}
-	out := api.NewErrorOutput(400, errors)
-	if len(errors) > 0 && response.Body.String() != out.String() {
-		t.Fail()
+	if len(errs) > 0 {
+		expected := httptest.NewRecorder()
+		api.WriteErrors(expected, 400, errs)
+		if response.Code != 400 || response.Body.String() != expected.Body.String() {
+			t.Fail()
+		}
 	}
 }
 
 func makeRequest(input SignupInput) (*http.Request, *httptest.ResponseRecorder) {
-	json, _ := json.Marshal(input)
-	body := bytes.NewBuffer(json)
+	body := strings.NewReader(mock.Json(input))
 	request := httptest.NewRequest("POST", "/signup", body)
 	response := httptest.NewRecorder()
 	return request, response

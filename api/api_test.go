@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,9 +25,7 @@ func TestApiWritesJsonContentTypeHeader(t *testing.T) {
 func TestApiReturns404IfNoEndpointHandlesTheRequest(t *testing.T) {
 	api := NewApi([]Endpoint{})
 	response := makeRequest(api, "/foo")
-	err := errors.New("Endpoint not found.")
-	out := NewErrorOutput(404, map[string]error{"not_found": err})
-	if response.Code != 404 || response.Body.String() != out.String() {
+	if response.Code != 404 || response.Body.String() != `{"errors":{"not_found":"Endpoint not found."}}` {
 		t.Fail()
 	}
 }

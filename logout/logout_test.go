@@ -2,7 +2,6 @@ package logout
 
 import (
 	"net/http/httptest"
-	"nstream/api"
 	"nstream/data/mock"
 	"testing"
 )
@@ -32,8 +31,7 @@ func TestAuthError(t *testing.T) {
 	response := httptest.NewRecorder()
 	request.Header.Add("Auth-Token", "invalid-token")
 	endpoint.Handle(request, response)
-	out := api.NewAuthErrorOutput()
-	if response.Code != 401 || response.Body.String() != out.String() {
+	if response.Code != 401 {
 		t.Fail()
 	}
 }

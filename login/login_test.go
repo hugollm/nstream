@@ -1,14 +1,13 @@
 package login
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"nstream/api"
 	"nstream/data"
 	"nstream/data/mock"
+	"strings"
 	"testing"
 )
 
@@ -20,15 +19,17 @@ func assertLogin(t *testing.T, input LoginInput, code int, errs map[string]error
 	if response.Code != code {
 		t.Fail()
 	}
-	out := api.NewErrorOutput(400, errs)
-	if len(errs) > 0 && response.Body.String() != out.String() {
-		t.Fail()
+	if len(errs) > 0 {
+		expected := httptest.NewRecorder()
+		api.WriteErrors(expected, 400, errs)
+		if response.Code != 400 || response.Body.String() != expected.Body.String() {
+			t.Fail()
+		}
 	}
 }
 
 func makeRequest(input LoginInput) (*http.Request, *httptest.ResponseRecorder) {
-	json, _ := json.Marshal(input)
-	body := bytes.NewBuffer(json)
+	body := strings.NewReader(mock.Json(input))
 	request := httptest.NewRequest("POST", "/login", body)
 	response := httptest.NewRecorder()
 	return request, response
@@ -62,11 +63,10 @@ func TestLoginWithValidCredentials(t *testing.T) {
 	request, response := makeRequest(input)
 	endpoint.Handle(request, response)
 	token := getDbSessionTokenByUserEmail(user.Email)
-	out := LoginOutput{token}
 	if response.Code != 200 {
 		t.Fail()
 	}
-	if response.Body.String() != string(out.Json()) {
+	if response.Body.String() != mock.Json(LoginOutput{token}) {
 		t.Fail()
 	}
 }
