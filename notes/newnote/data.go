@@ -4,7 +4,7 @@ import (
 	"nstream/data"
 )
 
-func writeNewNote(userId int, content string) data.Note {
+func insertNote(userId int, content string) data.Note {
 	note := data.Note{
 		UserId:  userId,
 		Content: content,

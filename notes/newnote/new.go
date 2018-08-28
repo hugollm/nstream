@@ -37,11 +37,6 @@ func (n NewNote) Handle(request *http.Request, response http.ResponseWriter) {
 		return
 	}
 	vInput, _ := validateInput(input)
-	note := writeNewNote(user.Id, vInput.Content)
-	api.WriteOutput(response, 200, NewNoteOutput{
-		Id:        note.Id,
-		UserId:    note.UserId,
-		Content:   note.Content,
-		CreatedAt: note.CreatedAt,
-	})
+	note := insertNote(user.Id, vInput.Content)
+	api.WriteOutput(response, 200, NewNoteOutput(note))
 }
