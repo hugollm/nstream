@@ -1,4 +1,4 @@
-package new
+package newnote
 
 import (
 	"nstream/data/mock"
