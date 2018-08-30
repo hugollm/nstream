@@ -15,7 +15,7 @@ The API must provide the following features:
 * [x] Login
 * [x] Logout
 * [x] Write note
-* [ ] Edit note
+* [x] Edit note
 * [ ] Delete note
 * [ ] Fetch notes by date interval
 * [ ] Email confirmation
