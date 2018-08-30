@@ -1,9 +1,12 @@
 package updatenote
 
-import "nstream/data"
+import (
+	"nstream/data"
+)
 
-func updateNote(id int, content string) {
-	_, err := data.DB.Exec("UPDATE notes SET content = $1 WHERE id = $2", content, id)
+func updateNote(userId int, noteId int, content string) {
+	query := "UPDATE notes SET content = $1 WHERE id = $2 AND user_id = $3"
+	_, err := data.DB.Exec(query, content, noteId, userId)
 	if err != nil {
 		panic(err)
 	}
