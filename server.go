@@ -6,7 +6,10 @@ import (
 	"nstream/api"
 	"nstream/login"
 	"nstream/logout"
+	"nstream/notes/deletenote"
+	"nstream/notes/fetchnotes"
 	"nstream/notes/newnote"
+	"nstream/notes/updatenote"
 	"nstream/signup"
 	"nstream/status"
 	"os"
@@ -40,4 +43,7 @@ var nts api.Api = api.NewApi([]api.Endpoint{
 	login.Login{},
 	logout.Logout{},
 	newnote.NewNote{},
+	updatenote.Update{},
+	deletenote.Delete{},
+	fetchnotes.Fetch{},
 })
