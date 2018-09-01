@@ -2,6 +2,7 @@ package status
 
 import (
 	"net/http/httptest"
+	"regexp"
 	"testing"
 )
 
@@ -28,7 +29,8 @@ func TestHandle(t *testing.T) {
 	if response.Code != 200 {
 		t.Fail()
 	}
-	if response.Body.String() != "OK" {
+	match, err := regexp.MatchString(`\{"version":"v.+"\}`, response.Body.String())
+	if !match || err != nil {
 		t.Fail()
 	}
 }
