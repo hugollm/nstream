@@ -8,7 +8,7 @@ import (
 var DB *sql.DB = makeDB()
 
 func makeDB() *sql.DB {
-	connStr := "user=postgres dbname=nstream host=/var/run/postgresql"
+	connStr := "user=nstream password=nstream dbname=nstream host=/var/run/postgresql"
 	db, openErr := sql.Open("postgres", connStr)
 	if openErr != nil {
 		panic(openErr)
