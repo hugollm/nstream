@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"nstream/data"
+	"reflect"
 )
 
 func Update(table string, id int, col string, value interface{}) {
@@ -31,4 +32,14 @@ func Json(input interface{}) string {
 		panic(err)
 	}
 	return string(bytes)
+}
+
+func HasZeroValues(obj interface{}) bool {
+	value := reflect.ValueOf(obj)
+	for i := 0; i < value.NumField(); i++ {
+		if value.Field(i).Interface() == reflect.Zero(value.Field(i).Type()).Interface() {
+			return true
+		}
+	}
+	return false
 }
