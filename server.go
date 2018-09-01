@@ -9,13 +9,25 @@ import (
 	"nstream/notes/newnote"
 	"nstream/signup"
 	"nstream/status"
+	"os"
 )
 
 func main() {
 	http.HandleFunc("/", handler)
 	log.SetFlags(log.Flags() + log.LUTC)
-	log.Println("Starting server on localhost:8080")
-	log.Fatal(http.ListenAndServe("localhost:8080", nil))
+	addr := getAddr()
+	log.Println("Starting server on " + addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
+}
+
+func getAddr() string {
+	host := ""
+	port := os.Getenv("PORT")
+	if port == "" {
+		host = "localhost"
+		port = "8080"
+	}
+	return host + ":" + port
 }
 
 func handler(response http.ResponseWriter, request *http.Request) {
