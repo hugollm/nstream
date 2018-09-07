@@ -26,6 +26,9 @@ database:
 	PGPASSWORD=nstream psql -U nstream nstream -f data/schema.sql
 	@echo "DONE.\n\n  NOTE: requires entry on pg_hba.conf: local all all md5\n"
 
+schema:
+	PGPASSWORD=nstream psql -U nstream nstream -f data/schema.sql
+
 
 nicer_test_output = sed "/RUN/d" | sed "/PASS/s//$(green)/" | sed "/FAIL/s//$(red)/"
 green = $(shell printf "\033[32mPASS\033[0m")
