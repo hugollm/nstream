@@ -5,6 +5,9 @@ create table if not exists users (
     created_at timestamp with time zone default current_timestamp
 );
 
+alter table users add column if not exists verified boolean not null default false;
+alter table users add column if not exists verification_code varchar(64) default null;
+
 create table if not exists sessions (
     id bigserial primary key,
     user_id bigint not null references users (id) on delete cascade,
