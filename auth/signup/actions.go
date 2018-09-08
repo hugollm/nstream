@@ -22,7 +22,7 @@ func userWithEmailExists(email string) bool {
 }
 
 func addUser(email string, pass string) {
-	query := "INSERT INTO USERS (email, password, verification_code) VALUES ($1, $2, $3)"
+	query := "INSERT INTO USERS (email, password, verification_token) VALUES ($1, $2, $3)"
 	_, err := data.DB.Exec(query, email, pass, makeToken())
 	if err != nil {
 		panic(err)

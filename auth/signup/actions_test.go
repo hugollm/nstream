@@ -33,13 +33,13 @@ func TestAddUserPersistsOnDb(t *testing.T) {
 	}
 }
 
-func TestNewUserGetsAVerificationCode(t *testing.T) {
+func TestNewUserGetsAVerificationToken(t *testing.T) {
 	email := mock.RandString(50)
 	addUser(email, "some-hash")
-	var verificationCode string
-	query := "SELECT verification_code FROM users WHERE email = $1"
-	data.DB.QueryRow(query, email).Scan(&verificationCode)
-	if len(verificationCode) < 64 {
+	var token string
+	query := "SELECT verification_token FROM users WHERE email = $1"
+	data.DB.QueryRow(query, email).Scan(&token)
+	if len(token) < 64 {
 		t.Fail()
 	}
 }
