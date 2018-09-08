@@ -7,6 +7,7 @@ import (
 	"nstream/auth/login"
 	"nstream/auth/logout"
 	"nstream/auth/signup"
+	"nstream/auth/verify"
 	"nstream/notes/deletenote"
 	"nstream/notes/fetchnotes"
 	"nstream/notes/newnote"
@@ -40,6 +41,7 @@ func handler(response http.ResponseWriter, request *http.Request) {
 var nts api.Api = api.NewApi([]api.Endpoint{
 	status.Status{},
 	signup.Signup{},
+	verify.Verify{},
 	login.Login{},
 	logout.Logout{},
 	newnote.NewNote{},
