@@ -1,6 +1,7 @@
 package signup
 
 import (
+	"nstream/data"
 	"nstream/data/mock"
 	"strings"
 	"testing"
@@ -28,6 +29,17 @@ func TestAddUserPersistsOnDb(t *testing.T) {
 		t.Fail()
 	}
 	if !mock.Exists("users", "password", "some-hash") {
+		t.Fail()
+	}
+}
+
+func TestNewUserGetsAVerificationCode(t *testing.T) {
+	email := mock.RandString(50)
+	addUser(email, "some-hash")
+	var verificationCode string
+	query := "SELECT verification_code FROM users WHERE email = $1"
+	data.DB.QueryRow(query, email).Scan(&verificationCode)
+	if len(verificationCode) < 64 {
 		t.Fail()
 	}
 }

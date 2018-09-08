@@ -1,7 +1,9 @@
 package signup
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"nstream/data"
 )
 
@@ -20,9 +22,18 @@ func userWithEmailExists(email string) bool {
 }
 
 func addUser(email string, pass string) {
-	query := "INSERT INTO USERS (email, password) VALUES ($1, $2)"
-	_, err := data.DB.Exec(query, email, pass)
+	query := "INSERT INTO USERS (email, password, verification_code) VALUES ($1, $2, $3)"
+	_, err := data.DB.Exec(query, email, pass, makeToken())
 	if err != nil {
 		panic(err)
 	}
+}
+
+func makeToken() string {
+	buff := make([]byte, 32)
+	_, err := rand.Read(buff)
+	if err != nil {
+		panic(err)
+	}
+	return hex.EncodeToString(buff)
 }
